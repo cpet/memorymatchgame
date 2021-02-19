@@ -3,6 +3,8 @@ import * as GG from "./GG";
 import { PreloadScene } from "./scene/PreloadScene";
 import { LoadScene } from "./scene/LoadScene";
 import { LobbyScene } from "./scene/LobbyScene";
+import { GameScene } from "./scene/GameScene";
+
 
 export class MemoryMatchGame {
     constructor() {
@@ -19,7 +21,7 @@ export class MemoryMatchGame {
                 createContainer: true
             },
             physics: {
-                default: 'arcade',
+                default: "arcade",
                 arcade: {
                     debug: false,
                     fps: 60,
@@ -46,8 +48,8 @@ export class MemoryMatchGame {
             scene: [
                 PreloadScene,
                 LoadScene,
-                LobbyScene
-                // GameScene,
+                LobbyScene,
+                GameScene
             ]
         };
 

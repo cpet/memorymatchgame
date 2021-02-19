@@ -1,6 +1,6 @@
 import Phaser from "phaser";
-import * as GG from '../GG';
-import { ScaledButton } from '../ui/ScaledButton';
+import * as GG from "../GG";
+import { ScaledButton } from "../ui/ScaledButton";
 // import { ToggleButton } from 'src/ui/ToggleButton';
 
 export class LobbyScene extends Phaser.Scene {
@@ -91,6 +91,10 @@ export class LobbyScene extends Phaser.Scene {
         this.enableResizeListener();
 
         // GG.musicManager.setMusic(GG.MUSIC_KEYS.MENU_MUSIC);
+
+        // DEV.
+        // Go quickly into the game scene with a predefined grid type.
+        this._onGameStart(0);
     }
 
     /**
@@ -104,6 +108,8 @@ export class LobbyScene extends Phaser.Scene {
             fromScene: GG.KEYS.SCENE.LOBBY,
             grid: this._gridDatas[grid_conf_ix]
         };
+
+        this.scene.start(GG.KEYS.SCENE.GAME, data);
     }
 
     /**

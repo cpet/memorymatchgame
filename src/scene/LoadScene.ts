@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import * as GG from '../GG';
+import * as GG from "../GG";
 
 export class LoadScene extends Phaser.Scene {
     loadBarBg: Phaser.GameObjects.Image;
@@ -10,11 +10,9 @@ export class LoadScene extends Phaser.Scene {
     logoHere: Phaser.GameObjects.Image;
     preload() {
         
-        this.load.image(GG.KEYS.BG.FAR_BG, './assets/img/bg.png');
-        this.load.bitmapFont(GG.KEYS.FONTS.CHANGA_ONE, './assets/fonts/ChangaOne_0.png', './assets/fonts/ChangaOne.xml');
-
-        // this.load.atlas(GG.KEYS.TEX_MAIN_SS, './assets/img/SpriteSheet.png', './assets/img/SpriteSheet.json');
-        // this.load.atlas(GG.KEYS.TEX_MENUS_SS, './assets/img/MenusSpriteSheet.png', './assets/img/MenusSpriteSheet.json');
+        this.load.image(GG.KEYS.BG.FAR_BG, "./assets/img/bg.png");
+        this.load.bitmapFont(GG.KEYS.FONTS.CHANGA_ONE, "./assets/fonts/ChangaOne_0.png", "./assets/fonts/ChangaOne.xml");
+        this.load.atlas(GG.KEYS.TEX_SS1, "./assets/img/sprite_sheet1.png", "./assets/img/sprite_sheet1.json");
 
         // Load the sfx sprite.
         // this.load.audio(GG.SFX_SPRITES.ANSWER_FEEDBACK, ['assets/sfx/AnswerSfxSoundSprite.mp3', 'assets/sfx/AnswerSfxSoundSprite.ogg']);
@@ -28,7 +26,7 @@ export class LoadScene extends Phaser.Scene {
     }
 
     init() {
-        this.cameras.main.setBackgroundColor('#FFFFFF');
+        this.cameras.main.setBackgroundColor("#FFFFFF");
         let screen_w = this.game.renderer.width;
         let screen_h = this.game.renderer.height;
 
@@ -38,11 +36,11 @@ export class LoadScene extends Phaser.Scene {
         let load_bar_bg_graphics: Phaser.GameObjects.Graphics = this.make.graphics();
         load_bar_bg_graphics.fillStyle(0x1150a5);
         load_bar_bg_graphics.fillRect(0, 0, load_bar_bg_width, load_bar_bg_height);
-        load_bar_bg_graphics.generateTexture('load_bar_bg', load_bar_bg_width, load_bar_bg_height);
+        load_bar_bg_graphics.generateTexture("load_bar_bg", load_bar_bg_width, load_bar_bg_height);
         load_bar_bg_graphics.destroy();
         this.loadBarBg = this.add.image(screen_w * 0.5,
             screen_h * 0.9 - screen_h * 0.01,
-            'load_bar_bg');
+            "load_bar_bg");
 
         let load_bar_width: number = Math.round(screen_w * 0.86);
         let load_bar_height: number = Math.round(screen_h * 0.01);
@@ -51,13 +49,13 @@ export class LoadScene extends Phaser.Scene {
 
         load_bar_graphics.fillStyle(0x48dfed);
         load_bar_graphics.fillRect(0, 0, load_bar_width, load_bar_height);
-        load_bar_graphics.generateTexture('load_bar', load_bar_width, load_bar_height);
+        load_bar_graphics.generateTexture("load_bar", load_bar_width, load_bar_height);
         load_bar_graphics.destroy();
         this.loadBar = this.add.image(screen_w * 0.5,
             screen_h * 0.9 - screen_h * 0.01,
-            'load_bar');
+            "load_bar");
 
-        this.load.on('progress', this.onLoadProgress, this);
+        this.load.on("progress", this.onLoadProgress, this);
 
         this.logoHere = this.add.image(0, 0, GG.KEYS.LOGO_HERE);
         this.logoHere.setOrigin(0.5, 0.5);
@@ -115,7 +113,7 @@ export class LoadScene extends Phaser.Scene {
      */
     enableResizeListener() {
         GG.setCurrentScene(this);
-        this.scale.on('resize', this.onResize, this);
+        this.scale.on("resize", this.onResize, this);
     }
 
     /**
@@ -124,7 +122,7 @@ export class LoadScene extends Phaser.Scene {
      */
     disableResizeListener() {
         GG.setCurrentScene(null);
-        this.scale.off('resize', this.onResize, this);
+        this.scale.off("resize", this.onResize, this);
     }
 
     /**

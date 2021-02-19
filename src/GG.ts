@@ -3,7 +3,46 @@
  */
 
 export const CARD_TYPE = {
-    
+    BACK: 0,
+    BAT: 1,
+    CAT: 2,
+    COW: 3,
+    DRAGON: 4,
+    GARBAGE_MAN: 5,
+    GHOST_DOG: 6,
+    HEN: 7,
+    HORSE: 8,
+    PIG: 9,
+    SPIDER: 10,
+
+    /**
+     * Minimum allowed value.
+     */
+    MIN: 0,
+
+    /**
+     * Maximum allowed value.
+     */
+    MAX: 10
+}
+
+// export const CARD_FRAMES_NAMES = {
+//     BACK: 'card0000',
+//     BAT: 'card0001',
+//     CAT: 'card0002',
+//     COW: 'card0003',
+//     DRAGON: 'card0004',
+//     GARBAGE_MAN: 'card0005',
+//     GHOST_DOG: 'card0006',
+//     HEN: 'card0007',
+//     HORSE: 'card0008',
+//     PIG: 'card0009',
+//     SPIDER: 'card0010',
+// }
+
+export const ACTOR_ID = {
+    CARD: 0,
+    POOF_GFX: 1
 }
 
 /**
@@ -29,6 +68,16 @@ export const KEYS = {
     FONTS: {
         CHANGA_ONE: 'ChangaOne'
     },
+    /**
+     * Sprite sheet. 
+     * - card faces and back.
+     * - back button.
+     */
+    TEX_SS1: 'ss1',
+
+    ANIMS: {
+        CARD_FACES: 'card_faces',
+    },
 
     SCENE: {
         PRELOAD: 'preload_scene',
@@ -49,7 +98,7 @@ export const KEYS = {
     },
 
     UI: {
-        BTN_BAC: 'BtnBack'
+        BTN_BACK: 'backBtn0000'
     }
 };
 

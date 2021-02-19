@@ -1,0 +1,107 @@
+﻿{"frames": {
+
+"backBtn0000":
+{
+	"frame": {"x":594,"y":1272,"w":192,"h":164},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":192,"h":164},
+	"sourceSize": {"w":192,"h":164}
+},
+"card0000":
+{
+	"frame": {"x":0,"y":0,"w":295,"h":422},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":422},
+	"sourceSize": {"w":295,"h":422}
+},
+"card0001":
+{
+	"frame": {"x":0,"y":424,"w":295,"h":422},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":422},
+	"sourceSize": {"w":295,"h":422}
+},
+"card0002":
+{
+	"frame": {"x":0,"y":848,"w":295,"h":422},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":422},
+	"sourceSize": {"w":295,"h":422}
+},
+"card0003":
+{
+	"frame": {"x":0,"y":1272,"w":295,"h":422},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":422},
+	"sourceSize": {"w":295,"h":422}
+},
+"card0004":
+{
+	"frame": {"x":297,"y":0,"w":295,"h":422},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":422},
+	"sourceSize": {"w":295,"h":422}
+},
+"card0005":
+{
+	"frame": {"x":297,"y":424,"w":295,"h":422},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":422},
+	"sourceSize": {"w":295,"h":422}
+},
+"card0006":
+{
+	"frame": {"x":297,"y":848,"w":295,"h":422},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":422},
+	"sourceSize": {"w":295,"h":422}
+},
+"card0007":
+{
+	"frame": {"x":297,"y":1272,"w":295,"h":422},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":422},
+	"sourceSize": {"w":295,"h":422}
+},
+"card0008":
+{
+	"frame": {"x":594,"y":0,"w":295,"h":422},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":422},
+	"sourceSize": {"w":295,"h":422}
+},
+"card0009":
+{
+	"frame": {"x":594,"y":424,"w":295,"h":422},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":422},
+	"sourceSize": {"w":295,"h":422}
+},
+"card0010":
+{
+	"frame": {"x":594,"y":848,"w":295,"h":422},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":422},
+	"sourceSize": {"w":295,"h":422}
+}},
+"meta": {
+	"app": "Adobe Animate",
+	"version": "18.0.1.115",
+	"image": "sprite_sheet1.png",
+	"format": "RGBA8888",
+	"size": {"w":1024,"h":2048},
+	"scale": "1"
+}
+}

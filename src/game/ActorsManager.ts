@@ -33,7 +33,7 @@ export class ActorsManager {
      * @param type the type of card to create. Use one of the GG.CARD_TYPE constants.
      */
     createNewCard(type: number): Card {
-        let card = new Card(type, this.scene);
+        let card = new Card(type, this.scene, -1);
         card.reset();
         return card;
     }

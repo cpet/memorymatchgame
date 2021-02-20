@@ -25,8 +25,6 @@ export class LobbyScene extends Phaser.Scene {
         });
     }
 
-    init() { }
-
     create() {
         this.bg = this.add.image(0, 0, GG.KEYS.BG.FAR_BG).setOrigin(0, 0);
 
@@ -94,7 +92,7 @@ export class LobbyScene extends Phaser.Scene {
 
         // DEV.
         // Go quickly into the game scene with a predefined grid type.
-        this._onGameStart(0);
+        this._onGameStart(2);
     }
 
     /**

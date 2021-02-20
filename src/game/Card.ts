@@ -11,6 +11,11 @@ export class Card {
     spr: Phaser.GameObjects.Sprite;
     private _type: number = -1;
 
+    isFlipping: boolean = false;
+    isFlipped: boolean = false;
+
+    frames: Phaser.Animations.AnimationFrame[];
+
     /**
      * Instantiates the encapsulated sprite into the given scene.
      * @param type    the index type of this card, use one of the GG.CARD_TYPE constants.
@@ -18,8 +23,8 @@ export class Card {
      */
     constructor(type: number, scene: Phaser.Scene) {
         // Play must be called for the anims to become available.
-        let card_spr = scene.add.sprite(200, 120, GG.KEYS.TEX_SS1).play(GG.KEYS.ANIMS.CARD_FACES);
-        this.spr = card_spr;
+        this.spr = scene.add.sprite(200, 120, GG.KEYS.TEX_SS1).play(GG.KEYS.ANIMS.CARD_FACES).setOrigin(0, 0);
+        this.frames = this.spr.anims.currentAnim.frames;
         this.type = type;
     }
 
@@ -31,17 +36,32 @@ export class Card {
      * Sets the type index of this card and the frame of the encapsulated sprite.
      */
     set type(v: number) {
-        let frames = this.spr.anims.currentAnim.frames;
-        if (v > -1 && v < frames.length) {
+        if (v > 0 && v < this.frames.length) {
             this._type = v;
-            let stop_frame = frames[v];
+            let stop_frame = this.frames[v];
             // Freeze the animation at the stop frame.
             this.spr.setFrame(stop_frame.frame.name).stop();
         }
         else {
-            console.error("Card.type... given index %s, is out of bounds, try one of the GG.CARD_TYPE constants instead!", v);
+            console.error(
+                "Card.type... given index %s, is out of bounds, try one of the GG.CARD_TYPE constants instead.", v);
         }
     }
+
+    startFlippingAnimation() {
+
+    }
+
+    flip() {
+        this.isFlipped = !this.isFlipped;
+        if (this.isFlipped == true) {
+            this.spr.setFrame(this.frames[GG.CARD_BACK_IX].frame.name);
+        }
+        else {
+            this.spr.setFrame(this.frames[this._type].frame.name);
+        }
+    }
+
 
     setXY(x: number, y: number) {
         this.spr.x = x;
@@ -62,7 +82,7 @@ export class Card {
         this.spr.setVisible(is_visible);
     }
 
-    get isVisible():boolean {
+    get isVisible(): boolean {
         return this.spr.visible;
     }
 

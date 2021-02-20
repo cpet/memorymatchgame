@@ -24,7 +24,7 @@ export class ActorsManager {
         this._pools[GG.ACTOR_ID.CARD] = [];
 
         for (let i = 0; i < this.cardsPoolSize; i++) {
-            this._pools[GG.ACTOR_ID.CARD].push(this.createNewCard(GG.CARD_TYPE.BACK));
+            this._pools[GG.ACTOR_ID.CARD].push(this.createNewCard(GG.CARD_TYPE.MIN));
         }
     }
 

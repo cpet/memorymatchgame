@@ -2,8 +2,8 @@
  * A global game space for the game's settings and such.
  */
 
+export const CARD_BACK_IX = 0;
 export const CARD_TYPE = {
-    BACK: 0,
     BAT: 1,
     CAT: 2,
     COW: 3,
@@ -18,7 +18,7 @@ export const CARD_TYPE = {
     /**
      * Minimum allowed value.
      */
-    MIN: 0,
+    MIN: 1,
 
     /**
      * Maximum allowed value.

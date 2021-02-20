@@ -92,7 +92,7 @@ export class LobbyScene extends Phaser.Scene {
 
         // DEV.
         // Go quickly into the game scene with a predefined grid type.
-        this._onGameStart(2);
+        this._onGameStart(1);
     }
 
     /**

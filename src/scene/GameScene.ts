@@ -2,22 +2,30 @@ import Phaser from "phaser";
 import { Card } from "../game/Card";
 import * as GG from "../GG";
 import { ActorsManager } from "../game/ActorsManager";
+import { TweenMax } from "gsap";
 
 export class GameScene extends Phaser.Scene {
     bg: Phaser.GameObjects.Image;
 
+    /**
+     * Game actors pooling.
+     */
     actorsMng: ActorsManager;
+
     gridSize: Phaser.Geom.Point;
     gridCont: Phaser.GameObjects.Container;
     gridPadding: Phaser.Geom.Point;
-    cards: Card[];
-    
-    /**
-     * The number of cards currently in play.
-     * Should not exceed 2?
-     */
-    numCardsInPlay:number = 0;
 
+    /**
+     * All the cards.
+     */
+    cards: Card[];
+    numMatches: number = 0;
+
+    /**
+     * Cards that are in play, or subject to being matched.
+     */
+    private _cardsInPlay: Card[];
 
     constructor() {
         super({
@@ -45,9 +53,14 @@ export class GameScene extends Phaser.Scene {
         }
 
         this.gridPadding = new Phaser.Geom.Point(10, 10);
+        this.cards = [];
+        this._cardsInPlay = [];
+
         this.buildGrid();
         this.fit();
         this.enableResizeListener();
+
+        this.numMatches = 0;
 
         // DEV.
         // this.testCardCreation(); // OK.
@@ -58,13 +71,24 @@ export class GameScene extends Phaser.Scene {
      * Builds the game cards grid using the this.gridSize from the previous scene.
      */
     buildGrid() {
-        this.cards = [];
+        let card_types = [];
+        let length: number = this.gridSize.x * this.gridSize.y / 2 + 1;
+        for (let i = 1; i < length; i++) {
+            card_types.push(i);
+            card_types.push(i);
+        }
+
+        // Phaser.Utils.Array.Shuffle(card_types);
+
+        console.log("card_types: ", card_types);
+        console.log("this.gridSize: ", this.gridSize);
 
         for (let row = 0; row < this.gridSize.y; row++) {
             for (let col = 0; col < this.gridSize.x; col++) {
+
                 let card = this.actorsMng.getCard(GG.CARD_TYPE.MIN);
-                card.gridIx = row * this.gridSize.y + col;
-                console.log("card.gridIx: ", card.gridIx);
+                card.gridIx = col + row * this.gridSize.x;
+                card.type = card_types[card.gridIx];
 
                 card.setXY(
                     this.gridPadding.x + col * (card.spr.width + this.gridPadding.x) + card.spr.width * 0.5,
@@ -73,17 +97,87 @@ export class GameScene extends Phaser.Scene {
 
                 card.setInterractive(true);
                 card.on("pointerdown", this._onCardPointerDown, this);
+
                 this.gridCont.add(card.spr);
                 this.cards.push(card);
             }
         }
     }
 
+    /**
+     * Flips the card face up if allowed to do so.
+     * Checks for a successful match.
+     * A maximum of 2 cards can be in play at once.
+     * 
+     * @param pointer 
+     * @param localX 
+     * @param localY 
+     * @param event 
+     * @param card 
+     */
     private _onCardPointerDown(pointer, localX, localY, event, card: Card) {
-        // if (this.numCardsInPlay < 12) {
+        // console.log("_onCardPointerDown, %s", this._cardsInPlay);
+
+        if (this._cardsInPlay.length < 2) {
             card.startFlippingAnimation();
-            this.numCardsInPlay++;
-        // }
+            this._cardsInPlay.push(card);
+
+            // More than one card calls for a match check.
+            if (this._cardsInPlay.length > 1) {
+                if (this._cardsInPlay[0].type == this._cardsInPlay[1].type) {
+                    this._onMatchSucceded();
+                }
+                else {
+                    TweenMax.delayedCall(0.25, this._onMatchFailed, null, this);
+                }
+            }
+        }
+    }
+
+    /**
+     * On a succeful match remove both matched cards from the cards in play
+     * and disable the input on them.
+     * Checks for game won condistions.
+     */
+    private _onMatchSucceded() {
+        while (this._cardsInPlay.length > 0) {
+            let card: Card = this._cardsInPlay.pop();
+            card.setAsMatched();
+            card.startSuccessAnimation();
+        }
+
+        this.numMatches += 2;
+        // Game won condition: all cards are matched.
+        if (this.numMatches == this.cards.length) {
+            console.log("WINNER!!!");
+        }
+    }
+
+    /**
+     * On a failed match, temporarely disable the input on the cards and
+     * flip them face down later on. 
+     */
+    private _onMatchFailed() {
+        this._cardsInPlay[0].startFailedAnimation();
+        TweenMax.delayedCall(1, this._rejectCardsInPlay, null, this);
+    }
+
+    /**
+     * Empties the cards in play tracker and flips any card in play face down.
+     */
+    private _rejectCardsInPlay() {
+        while (this._cardsInPlay.length > 0) {
+            let card: Card = this._cardsInPlay.pop();
+            card.startFlippingAnimation();
+        }
+    }
+
+    private _doGameWon() {
+
+    }
+
+    private _doGameLost() {
+
     }
 
     /**
@@ -110,6 +204,19 @@ export class GameScene extends Phaser.Scene {
         this.gridCont.scale = Math.min(screen_w / grid_cont_w, screen_h / grid_cont_h);
         this.gridCont.x = Math.floor(Math.abs(grid_cont_w * this.gridCont.scale - screen_w) * 0.5);
         this.gridCont.y = Math.floor(Math.abs(grid_cont_h * this.gridCont.scale - screen_h) * 0.5);
+    }
+
+    reset() {
+        while (this.cards.length > 0) {
+            const card: Card = this.cards.pop();
+            card.off("pointerdown", this._onCardPointerDown, this);
+            this.actorsMng.poolCard(card);
+        }
+
+        this.gridCont.removeAll();
+        TweenMax.killAll();
+
+        this.numMatches = 0;
     }
 
 

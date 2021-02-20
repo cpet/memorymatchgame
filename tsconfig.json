@@ -3,14 +3,20 @@
         /* Basic Options */
         "target": "es5", /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017','ES2018' or 'ESNEXT'. */
         "module": "commonjs", /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
-        // "outDir": "js",
         "alwaysStrict": true,
         "esModuleInterop": true, /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
         "allowSyntheticDefaultImports": true,
         "baseUrl": ".",
         "moduleResolution": "node",
+        /*  This might work acording to stackoverflow, not risking errors for 1 promise in the code.
+            Using the delay call approach this time.*/
+        /* "lib": [
+            "dom",
+            "es5",
+            "es2015.promise"
+        ]*/
+
         // "types": ["./types.d.ts"],
-        // "traceResolution": true
     },
     // "exclude": [
     //     "lib/**/*",

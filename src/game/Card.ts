@@ -19,7 +19,12 @@ export class Card extends Phaser.Events.EventEmitter {
     gridIx: number = -1;
 
     private _type: number = -1;
+
     private _flipTL: TimelineMax;
+    private _failTL: TimelineMax;
+    private _successTL: TimelineMax;
+
+    private _isMatched: boolean = false;
 
     /**
      * Instantiates the encapsulated sprite into the given scene.
@@ -38,16 +43,16 @@ export class Card extends Phaser.Events.EventEmitter {
         this.type = type;
 
         this.gridIx = grid_ix;
+        this._isMatched = false;
 
-        //
-
+        // Flip animation timeline.
         this._flipTL = new TimelineMax();
         this._flipTL
             .to(this.spr, 0.15, {
                 scaleX: 0,
                 scaleY: 1.2,
                 ease: Power2.easeOut,
-                onStart:()=>{
+                onStart: () => {
                     this.setInterractive(false);
                 },
                 onComplete: () => {
@@ -61,11 +66,18 @@ export class Card extends Phaser.Events.EventEmitter {
                 ease: Power2.easeOut,
                 onComplete: () => {
                     this.isFlipping = false;
-                    this.setInterractive(true);
+                    if (!this.isShowingFace) {
+                        this.setInterractive(true);
+                    }
                 },
                 onCompleteScope: this
             });
         this._flipTL.pause();
+
+        // Fail animation timeline.
+
+        // Success animation timeline.
+
     }
 
     get type(): number {
@@ -91,8 +103,16 @@ export class Card extends Phaser.Events.EventEmitter {
     }
 
     startFlippingAnimation() {
-        // this.setInterractive(false);
+        this.setInterractive(false);
         this._flipTL.restart();
+    }
+
+    startSuccessAnimation() {
+
+    }
+
+    startFailedAnimation() {
+
     }
 
     /**
@@ -116,7 +136,7 @@ export class Card extends Phaser.Events.EventEmitter {
     }
 
     setInterractive(is_interractive: boolean) {
-        if (is_interractive == true && !this.isFlipping) {
+        if (is_interractive == true && !this.isFlipping && !this._isMatched) {
             this.spr.setInteractive({ useHandCursor: true });
             this.spr.on("pointerdown", this._onPointerDown, this);
         }
@@ -128,6 +148,15 @@ export class Card extends Phaser.Events.EventEmitter {
 
     private _onPointerDown(pointer, localX, localY, event) {
         this.emit("pointerdown", pointer, localX, localY, event, this);
+    }
+
+    setAsMatched() {
+        this.setInterractive(false);
+        this._isMatched = true;
+    }
+
+    get isMatched(): boolean {
+        return this._isMatched;
     }
 
     setXY(x: number, y: number) {
@@ -156,6 +185,7 @@ export class Card extends Phaser.Events.EventEmitter {
     reset() {
         this.setActive(false);
         this.setVisible(false);
+        this._isMatched = false;
 
         this.setInterractive(false);
         TweenMax.killTweensOf(this);

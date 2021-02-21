@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import { Card } from "../game/Card";
 import * as GG from "../GG";
 import { ActorsManager } from "../game/ActorsManager";
-import { TweenMax } from "gsap";
+import { Power2, TweenMax } from "gsap";
 
 export class GameScene extends Phaser.Scene {
     bg: Phaser.GameObjects.Image;
@@ -26,6 +26,8 @@ export class GameScene extends Phaser.Scene {
      * Cards that are in play, or subject to being matched.
      */
     private _cardsInPlay: Card[];
+
+    private _gameWonParticles: Phaser.GameObjects.Particles.ParticleEmitter;
 
     constructor() {
         super({
@@ -65,6 +67,7 @@ export class GameScene extends Phaser.Scene {
         // DEV.
         // this.testCardCreation(); // OK.
         // this.testCardPooling(); // OK.
+        // this._doGameWon(); // OK.
     }
 
     /**
@@ -149,7 +152,7 @@ export class GameScene extends Phaser.Scene {
         this.numMatches += 2;
         // Game won condition: all cards are matched.
         if (this.numMatches == this.cards.length) {
-            console.log("WINNER!!!");
+            this._doGameWon();
         }
     }
 
@@ -173,7 +176,62 @@ export class GameScene extends Phaser.Scene {
     }
 
     private _doGameWon() {
+        let screen_w: number = this.game.renderer.width;
+        let screen_h: number = this.game.renderer.height;
 
+        let card: Card = this.cards[0];
+        let frame_names: string[] = [];
+        let card_face_frames = this.anims.generateFrameNames(GG.KEYS.TEX_SS1, { prefix: 'card', end: 10, zeroPad: 4 });
+        for (let i = 1; i < card_face_frames.length; i++) {
+            const frame: Phaser.Types.Animations.AnimationFrame = card_face_frames[i];
+            frame_names.push(frame.frame + "");
+        }
+
+        let particles = this.add.particles(GG.KEYS.TEX_SS1);
+        this.gridCont.add(particles);
+        let grid_width: number = (card.spr.displayWidth + this.gridPadding.x) * this.gridSize.x;
+        this._gameWonParticles = particles.createEmitter({
+            frame: frame_names,
+            x: { min: card.spr.displayWidth / 2, max: grid_width - card.spr.displayWidth / 2 },
+            y: -card.spr.displayHeight / 2,
+            rotate: { min: 0, max: 360 },
+            // angle: { min: -45, max: 45 },
+            collideBottom: true,
+            lifespan: 8000,
+            speedY: { min: 200, max: 280 },
+            frequency: 500,
+            quantity: 2,
+            scaleX: { min: 0.1, max: 1.2 },
+            scaleY: { min: 0.1, max: 1.2 },
+            alpha: { min: 0.1, max: 1 },
+            accelerationY: { min: 100, max: 200 },
+            emitCallback: (particle, emitter) => {
+                //// Must declare the on complete before use for the transpiler to be happy.
+                // 2.
+                let onFirstComplete = (particle, emitter) => {
+                    TweenMax.to(particle, Phaser.Math.RND.realInRange(1.75, 2.5), {
+                        scaleX: Phaser.Math.RND.realInRange(0.9, 1),
+                        scaleY: Phaser.Math.RND.realInRange(0.9, 1),
+                        ease: Power2.easeInOut
+                    });
+                }
+
+                // 1.
+                TweenMax.to(particle, Phaser.Math.RND.realInRange(1.75, 2.5), {
+                    scaleX: Phaser.Math.RND.realInRange(0.75, 0.85),
+                    scaleY: Phaser.Math.RND.realInRange(0.7, 0.8),
+                    onComplete: onFirstComplete,
+                    onCompleteScope: this,
+                    onCompleteParams: [particle, emitter],
+                    ease: Power2.easeInOut
+                });
+
+                particle.alpha = 0.1;
+                TweenMax.to(particle, 0.5, { alpha: 1 });
+                TweenMax.to(particle, 4, { angle: Phaser.Math.RND.between(0, 360), });
+            },
+            emitCallbackScope: this
+        });
     }
 
     private _doGameLost() {
@@ -204,6 +262,11 @@ export class GameScene extends Phaser.Scene {
         this.gridCont.scale = Math.min(screen_w / grid_cont_w, screen_h / grid_cont_h);
         this.gridCont.x = Math.floor(Math.abs(grid_cont_w * this.gridCont.scale - screen_w) * 0.5);
         this.gridCont.y = Math.floor(Math.abs(grid_cont_h * this.gridCont.scale - screen_h) * 0.5);
+
+        // If the game won particles emiter is set, update it's x spawn locations.
+        // if (this._gameWonParticles) {
+        //     this._gameWonParticles.x = { min: card.spr.displayWidth / 2, max: screen_w - card.spr.displayWidth / 2 }
+        // }
     }
 
     reset() {

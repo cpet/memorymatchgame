@@ -34,7 +34,7 @@ export class Card extends Phaser.Events.EventEmitter {
     constructor(type: number, scene: Phaser.Scene, grid_ix: number) {
         super();
         // Play must be called for the anims to become available.
-        this.spr = scene.add.sprite(200, 120, GG.KEYS.TEX_SS1)
+        this.spr = scene.add.sprite(200, 120, GG.KEYS.ATLAS_SS1)
             .play(GG.KEYS.ANIMS.CARD_FACES)
             .stop();
 

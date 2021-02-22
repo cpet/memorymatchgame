@@ -18,7 +18,7 @@
 },
 "card0001":
 {
-	"frame": {"x":0,"y":424,"w":295,"h":422},
+	"frame": {"x":297,"y":0,"w":295,"h":422},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":422},
@@ -26,7 +26,7 @@
 },
 "card0002":
 {
-	"frame": {"x":0,"y":848,"w":295,"h":422},
+	"frame": {"x":594,"y":0,"w":295,"h":422},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":422},
@@ -34,7 +34,7 @@
 },
 "card0003":
 {
-	"frame": {"x":0,"y":1272,"w":295,"h":422},
+	"frame": {"x":0,"y":424,"w":295,"h":422},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":422},
@@ -42,7 +42,7 @@
 },
 "card0004":
 {
-	"frame": {"x":297,"y":0,"w":295,"h":422},
+	"frame": {"x":297,"y":424,"w":295,"h":422},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":422},
@@ -50,7 +50,7 @@
 },
 "card0005":
 {
-	"frame": {"x":297,"y":424,"w":295,"h":422},
+	"frame": {"x":594,"y":424,"w":295,"h":422},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":422},
@@ -58,7 +58,7 @@
 },
 "card0006":
 {
-	"frame": {"x":297,"y":848,"w":295,"h":422},
+	"frame": {"x":0,"y":848,"w":295,"h":422},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":422},
@@ -66,7 +66,7 @@
 },
 "card0007":
 {
-	"frame": {"x":297,"y":1272,"w":295,"h":422},
+	"frame": {"x":297,"y":848,"w":295,"h":422},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":422},
@@ -74,7 +74,7 @@
 },
 "card0008":
 {
-	"frame": {"x":594,"y":0,"w":295,"h":422},
+	"frame": {"x":594,"y":848,"w":295,"h":422},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":422},
@@ -82,7 +82,7 @@
 },
 "card0009":
 {
-	"frame": {"x":594,"y":424,"w":295,"h":422},
+	"frame": {"x":0,"y":1272,"w":295,"h":422},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":422},
@@ -90,11 +90,27 @@
 },
 "card0010":
 {
-	"frame": {"x":594,"y":848,"w":295,"h":422},
+	"frame": {"x":297,"y":1272,"w":295,"h":422},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":422},
 	"sourceSize": {"w":295,"h":422}
+},
+"lifebar0000":
+{
+	"frame": {"x":0,"y":1696,"w":844,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":844,"h":80},
+	"sourceSize": {"w":844,"h":80}
+},
+"lifebar0001":
+{
+	"frame": {"x":0,"y":1778,"w":818,"h":54},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":13,"y":13,"w":844,"h":80},
+	"sourceSize": {"w":844,"h":80}
 }},
 "meta": {
 	"app": "Adobe Animate",

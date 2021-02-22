@@ -69,11 +69,11 @@ export const KEYS = {
         CHANGA_ONE: 'ChangaOne'
     },
     /**
-     * Sprite sheet. 
+     * Atlas / Sprite sheet. 
      * - card faces and back.
      * - back button.
      */
-    TEX_SS1: 'ss1',
+    ATLAS_SS1: 'ss1',
 
     ANIMS: {
         CARD_FACES: 'card_faces',
@@ -98,7 +98,9 @@ export const KEYS = {
     },
 
     UI: {
-        BTN_BACK: 'backBtn0000'
+        BTN_BACK: 'backBtn0000',
+        LIFE_BAR_BG: 'lifebar0000',
+        LIFE_BAR: 'lifebar0001',
     }
 };
 

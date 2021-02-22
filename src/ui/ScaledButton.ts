@@ -74,6 +74,7 @@ export class ScaledButton {
 
     setOrigin(ox: number, oy: number) {
         this.go.setOrigin(ox, oy);
+        return this;
     }
 
     //// Tweenable scales.
@@ -126,6 +127,8 @@ export class ScaledButton {
         this.defaultValues.y = this.y;
         this.defaultValues.scaleX = this.go.scaleX;
         this.defaultValues.scaleY = this.go.scaleY;
+
+        return this;
     }
 
 }

@@ -1,8 +1,10 @@
 import Phaser from "phaser";
-import { Card } from "../game/Card";
 import * as GG from "../GG";
+import { Card } from "../game/Card";
+import { LifeBar } from "../ui/LifeBar";
 import { ActorsManager } from "../game/ActorsManager";
 import { Power2, TweenMax } from "gsap";
+import { ScaledButton } from "src/ui/ScaledButton";
 
 export class GameScene extends Phaser.Scene {
     bg: Phaser.GameObjects.Image;
@@ -29,6 +31,9 @@ export class GameScene extends Phaser.Scene {
 
     private _gameWonParticles: Phaser.GameObjects.Particles.ParticleEmitter;
 
+    private _lifeBar: LifeBar;
+    private _backBtn: ScaledButton;
+
     constructor() {
         super({
             key: GG.KEYS.SCENE.GAME
@@ -39,7 +44,7 @@ export class GameScene extends Phaser.Scene {
         this.bg = this.add.image(0, 0, GG.KEYS.BG.FAR_BG).setOrigin(0, 0);
 
         // Card faces as an animation.
-        let card_face_frames = this.anims.generateFrameNames(GG.KEYS.TEX_SS1, { prefix: 'card', end: 10, zeroPad: 4 });
+        let card_face_frames = this.anims.generateFrameNames(GG.KEYS.ATLAS_SS1, { prefix: 'card', end: 10, zeroPad: 4 });
         this.anims.create({ key: GG.KEYS.ANIMS.CARD_FACES, frames: card_face_frames, repeat: -1, frameRate: 30 });
 
         // Actors pooling.
@@ -59,6 +64,14 @@ export class GameScene extends Phaser.Scene {
         this._cardsInPlay = [];
 
         this.buildGrid();
+
+        // Some UI. In a larger project the game UI would normally have it's own class due to high volume of event handlers.
+        this._lifeBar = new LifeBar(this, 0, 0, GG.KEYS.ATLAS_SS1, GG.KEYS.UI.LIFE_BAR_BG, GG.KEYS.UI.LIFE_BAR);
+        this._lifeBar.addToContainer(this.gridCont);
+
+        this._backBtn = new ScaledButton(this.add.image(0, 0, GG.KEYS.ATLAS_SS1, GG.KEYS.UI.BTN_BACK));
+        this._backBtn.go.on("pointerdown", this._onBackBtnPointerDown);
+
         this.fit();
         this.enableResizeListener();
 
@@ -81,10 +94,11 @@ export class GameScene extends Phaser.Scene {
             card_types.push(i);
         }
 
+        // DEV: used in production.
         // Phaser.Utils.Array.Shuffle(card_types);
 
-        console.log("card_types: ", card_types);
-        console.log("this.gridSize: ", this.gridSize);
+        // console.log("card_types: ", card_types);
+        // console.log("this.gridSize: ", this.gridSize);
 
         for (let row = 0; row < this.gridSize.y; row++) {
             for (let col = 0; col < this.gridSize.x; col++) {
@@ -181,13 +195,13 @@ export class GameScene extends Phaser.Scene {
 
         let card: Card = this.cards[0];
         let frame_names: string[] = [];
-        let card_face_frames = this.anims.generateFrameNames(GG.KEYS.TEX_SS1, { prefix: 'card', end: 10, zeroPad: 4 });
+        let card_face_frames = this.anims.generateFrameNames(GG.KEYS.ATLAS_SS1, { prefix: 'card', end: 10, zeroPad: 4 });
         for (let i = 1; i < card_face_frames.length; i++) {
             const frame: Phaser.Types.Animations.AnimationFrame = card_face_frames[i];
             frame_names.push(frame.frame + "");
         }
 
-        let particles = this.add.particles(GG.KEYS.TEX_SS1);
+        let particles = this.add.particles(GG.KEYS.ATLAS_SS1);
         this.gridCont.add(particles);
         let grid_width: number = (card.spr.displayWidth + this.gridPadding.x) * this.gridSize.x;
         this._gameWonParticles = particles.createEmitter({
@@ -252,6 +266,24 @@ export class GameScene extends Phaser.Scene {
         this.bg.x = Math.floor((screen_w - this.bg.displayWidth) * 0.5);
         this.bg.y = Math.floor((screen_h - this.bg.displayHeight) * 0.5);
 
+        // Fit the grid of cards.
+        if (screen_w > screen_h) {
+            this.fitLandscape();
+        }
+        else {
+            this.fitPortrait();
+        }
+
+        // Place the back button top right with some slight padding.
+        this._backBtn.setScale(this.gridCont.scale * 1.1);
+        this._backBtn.x = Math.floor(screen_w - this._backBtn.displayWidth / 2 - screen_w * 0.005);
+        this._backBtn.y = Math.floor(screen_h * 0.075);
+    }
+
+    fitLandscape() {
+        let screen_w: number = this.game.renderer.width;
+        let screen_h: number = this.game.renderer.height;
+
         let card = this.cards[0];
         // If fit() is called before any cards are ready ignore.
         if (!card) { return; }
@@ -259,14 +291,42 @@ export class GameScene extends Phaser.Scene {
         let grid_cont_w: number = this.gridPadding.x + this.gridSize.x * (card.spr.width + this.gridPadding.x);
         let grid_cont_h: number = this.gridPadding.y + this.gridSize.y * (card.spr.height + this.gridPadding.y);
 
-        this.gridCont.scale = Math.min(screen_w / grid_cont_w, screen_h / grid_cont_h);
-        this.gridCont.x = Math.floor(Math.abs(grid_cont_w * this.gridCont.scale - screen_w) * 0.5);
-        this.gridCont.y = Math.floor(Math.abs(grid_cont_h * this.gridCont.scale - screen_h) * 0.5);
+        this._lifeBar.angle = 90;
 
-        // If the game won particles emiter is set, update it's x spawn locations.
-        // if (this._gameWonParticles) {
-        //     this._gameWonParticles.x = { min: card.spr.displayWidth / 2, max: screen_w - card.spr.displayWidth / 2 }
-        // }
+        // displayWidth and displayHeight are switched in landscape mode, because 
+        // the original image orientation is horizontal and a verticall lifebar layout is used.
+        this._lifeBar.setXY(
+            grid_cont_w + this._lifeBar.displayHeight,
+            (grid_cont_h - this._lifeBar.displayWidth) / 2);
+
+        grid_cont_w += this._lifeBar.displayHeight + this.gridPadding.x;
+
+        this.gridCont.scale = Math.min(screen_w * 0.9 / grid_cont_w, screen_h / grid_cont_h);
+        this.gridCont.x = Math.floor(Math.abs(grid_cont_w * this.gridCont.scale - screen_w * 0.9) * 0.5);
+        this.gridCont.y = Math.floor(Math.abs(grid_cont_h * this.gridCont.scale - screen_h) * 0.5);
+    }
+
+    fitPortrait() {
+        let screen_w: number = this.game.renderer.width;
+        let screen_h: number = this.game.renderer.height;
+
+        let card = this.cards[0];
+        // If fit() is called before any cards are ready ignore.
+        if (!card) { return; }
+
+        let grid_cont_w: number = this.gridPadding.x + this.gridSize.x * (card.spr.width + this.gridPadding.x);
+        let grid_cont_h: number = this.gridPadding.y + this.gridSize.y * (card.spr.height + this.gridPadding.y);
+
+        this._lifeBar.angle = 0;
+        this._lifeBar.setXY(
+            (grid_cont_w - this._lifeBar.displayWidth) / 2,
+            -this._lifeBar.displayHeight - this.gridPadding.y);
+
+        grid_cont_h += this._lifeBar.displayHeight + this.gridPadding.y;
+
+        this.gridCont.scale = Math.min(screen_w / grid_cont_w, screen_h * 0.9 / grid_cont_h);
+        this.gridCont.x = Math.floor(Math.abs(grid_cont_w * this.gridCont.scale - screen_w) * 0.5);
+        this.gridCont.y = Math.floor(Math.abs(grid_cont_h * this.gridCont.scale - screen_h * 1.15) * 0.5);
     }
 
     reset() {
@@ -299,6 +359,10 @@ export class GameScene extends Phaser.Scene {
     disableResizeListener() {
         GG.setCurrentScene(null);
         this.scale.off('resize', this.fit, this);
+    }
+
+    _onBackBtnPointerDown() {
+        console.log('back btn down ...');
     }
 
     ////

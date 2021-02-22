@@ -33,7 +33,7 @@ export class LobbyScene extends Phaser.Scene {
             new Phaser.Geom.Point(3, 4),
             new Phaser.Geom.Point(5, 2),
             new Phaser.Geom.Point(4, 4),
-            new Phaser.Geom.Point(3, 5),
+            new Phaser.Geom.Point(4, 5),
         ];
 
         this._btnsCont = this.add.container(0, 0);
@@ -92,7 +92,7 @@ export class LobbyScene extends Phaser.Scene {
 
         // DEV.
         // Go quickly into the game scene with a predefined grid type.
-        this._onGameStart(1);
+        // this._onGameStart(1);
     }
 
     /**

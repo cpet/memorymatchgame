@@ -53,6 +53,10 @@ export class Card extends Phaser.Events.EventEmitter {
                 scaleY: 1.2,
                 ease: Power2.easeOut,
                 onStart: () => {
+                    // Might be a bit overkill but adding it as make sure.
+                    // These type of decisions be discussed in the approval of the commit.
+                    // If it were another type of more generic object I would have opted it out in
+                    // favor of flexibility. But in the scope of this game it is simple enough to allow it.
                     this.setInterractive(false);
                 },
                 onComplete: () => {
@@ -63,21 +67,62 @@ export class Card extends Phaser.Events.EventEmitter {
             .to(this.spr, 0.15, {
                 scaleX: 1,
                 scaleY: 1,
-                ease: Power2.easeOut,
+                ease: Power2.easeIn,
                 onComplete: () => {
                     this.isFlipping = false;
                     if (!this.isShowingFace) {
                         this.setInterractive(true);
                     }
+
+                    this.emit(CARD_EVENTS.FLIP_COMPLETE, this)
                 },
                 onCompleteScope: this
             });
+
         this._flipTL.pause();
 
         // Fail animation timeline.
+        this._failTL = new TimelineMax();
+        this._failTL
+            .to(this.spr, 0.15, {
+                scaleX: 1.05,
+                scaleY: 1.05,
+                ease: Power2.easeOut
+            })
+            .to(this.spr, 0.1, {
+                angle: 15,
+                ease: Power2.easeIn
+            })
+            .to(this.spr, 0.1, {
+                angle: -15,
+                ease: Power2.easeInOut,
+                repeat: 3,
+                yoyo: true
+            })
+            .to(this.spr, 0.15, {
+                scaleX: 1,
+                scaleY: 1,
+                angle: 0,
+                ease: Power2.easeIn
+            });
+
+        this._failTL.pause();
 
         // Success animation timeline.
+        this._successTL = new TimelineMax();
+        this._successTL
+            .to(this.spr, 0.15, {
+                scaleX: 1.1,
+                scaleY: 1.15,
+                ease: Power2.easeOut
+            })
+            .to(this.spr, 0.15, {
+                scaleX: 1,
+                scaleY: 1,
+                ease: Power2.easeIn,
+            });
 
+        this._successTL.pause();
     }
 
     get type(): number {
@@ -108,11 +153,11 @@ export class Card extends Phaser.Events.EventEmitter {
     }
 
     startSuccessAnimation() {
-
+        this._successTL.restart();
     }
 
     startFailedAnimation() {
-
+        this._failTL.restart();
     }
 
     /**
@@ -147,7 +192,7 @@ export class Card extends Phaser.Events.EventEmitter {
     }
 
     private _onPointerDown(pointer, localX, localY, event) {
-        this.emit("pointerdown", pointer, localX, localY, event, this);
+        this.emit(CARD_EVENTS.POINTER_DOWN, pointer, localX, localY, event, this);
     }
 
     setAsMatched() {
@@ -189,6 +234,11 @@ export class Card extends Phaser.Events.EventEmitter {
 
         this.setInterractive(false);
         TweenMax.killTweensOf(this);
-    }
 
+        this.spr.scale = 1;
+    }
+}
+export const CARD_EVENTS = {
+    FLIP_COMPLETE: "flip_complete",
+    POINTER_DOWN: "pointerdown"
 }

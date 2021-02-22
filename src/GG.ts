@@ -58,7 +58,11 @@ export const SETTINGS = {
     CAM_FOLLOW_LERP: 0.01,
     IS_TOUCH_SCREEN: false,
     SFX_VOLUJME: 0.7,
-    MUSIC_VOLUME: 0.3
+    MUSIC_VOLUME: 0.3,
+    /**
+     * Because games might somehow become more interesting.
+     */
+    MAX_NUM_CARDS_IN_PLAY: 2
 };
 
 /**

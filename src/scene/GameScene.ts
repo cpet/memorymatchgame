@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import * as GG from "../GG";
-import { Card } from "../game/Card";
+import { Card, CARD_EVENTS } from "../game/Card";
 import { LifeBar } from "../ui/LifeBar";
 import { ActorsManager } from "../game/ActorsManager";
 import { Power2, TweenMax } from "gsap";
@@ -32,7 +32,22 @@ export class GameScene extends Phaser.Scene {
     private _gameWonParticles: Phaser.GameObjects.Particles.ParticleEmitter;
 
     private _lifeBar: LifeBar;
+    private _updateLifeBarEveryMs: number = 200;
+    private _lastLifeBarUpdateTime: number = 0;
+
     private _backBtn: ScaledButton;
+
+    private _gameTimeMax: number = 15 * 1000;
+    private _gameTimeLeft: number = 0;
+    private _gameTimeAddMatch: number = 3 * 1000;
+
+    private _isGameOver: boolean = false;
+
+    ////
+    /**
+     * Used in animating success of failure on recently played cards.
+     */
+    private _queuedCardIndexes: number[];
 
     constructor() {
         super({
@@ -70,21 +85,46 @@ export class GameScene extends Phaser.Scene {
         this._lifeBar.addToContainer(this.gridCont);
 
         this._backBtn = new ScaledButton(this.add.image(0, 0, GG.KEYS.ATLAS_SS1, GG.KEYS.UI.BTN_BACK));
-        this._backBtn.go.on("pointerdown", this._onBackBtnPointerDown);
+        // Not using CARD_EVENTS.POINTER_DOWN because that's a phaser game object specific.
+        // Unlikely they change it to 'pointerdown_somemore' but at least we can easilly update later on.
+        this._backBtn.go.on("pointerdown", this._goBackToTheLobbyScene, this);
 
         this.fit();
         this.enableResizeListener();
 
-        this.numMatches = 0;
-
+        this.startGame();
         // DEV.
         // this.testCardCreation(); // OK.
         // this.testCardPooling(); // OK.
         // this._doGameWon(); // OK.
     }
 
+    startGame() {
+        console.log("start game ...");
+        this._queuedCardIndexes = [];
+        this._isGameOver = false;
+        this.numMatches = 0;
+        this._gameTimeLeft = this._gameTimeMax;
+    }
+
+    update(time: number, delta_time: number) {
+        if (this._isGameOver == true) { return; }
+
+        this._gameTimeLeft -= delta_time;
+
+        if (this._gameTimeLeft <= 0) {
+            this._doGameLost();
+        }
+
+        // Update the lifebar.
+        if ((time - this._lastLifeBarUpdateTime) > this._updateLifeBarEveryMs) {
+            this._lastLifeBarUpdateTime = time;
+            this._lifeBar.percent = this._gameTimeLeft / this._gameTimeMax;
+        }
+    }
+
     /**
-     * Builds the game cards grid using the this.gridSize from the previous scene.
+     * Builds the grid of cards using the this.gridSize from the previous scene.
      */
     buildGrid() {
         let card_types = [];
@@ -113,7 +153,7 @@ export class GameScene extends Phaser.Scene {
                 );
 
                 card.setInterractive(true);
-                card.on("pointerdown", this._onCardPointerDown, this);
+                card.on(CARD_EVENTS.POINTER_DOWN, this._onCardPointerDown, this);
 
                 this.gridCont.add(card.spr);
                 this.cards.push(card);
@@ -133,15 +173,27 @@ export class GameScene extends Phaser.Scene {
      * @param card 
      */
     private _onCardPointerDown(pointer, localX, localY, event, card: Card) {
-        // console.log("_onCardPointerDown, %s", this._cardsInPlay);
-
-        if (this._cardsInPlay.length < 2) {
+        if (this._cardsInPlay.length < GG.SETTINGS.MAX_NUM_CARDS_IN_PLAY) {
             card.startFlippingAnimation();
             this._cardsInPlay.push(card);
 
             // More than one card calls for a match check.
-            if (this._cardsInPlay.length > 1) {
-                if (this._cardsInPlay[0].type == this._cardsInPlay[1].type) {
+            if (this._cardsInPlay.length >= GG.SETTINGS.MAX_NUM_CARDS_IN_PLAY) {
+                let first_card_type: number = this._cardsInPlay[0].type;
+                let is_a_match: boolean = true;
+
+                // Examine the rest of the cards in play for a mismatch.
+                // It is written this way to allow a possible more interesting matching options.
+                // @see GG.SETTINGS.MAX_NUM_CARDS_IN_PLAY.
+                for (let i = 1; i < this._cardsInPlay.length; i++) {
+                    const card: Card = this._cardsInPlay[i];
+                    if (card.type != first_card_type) {
+                        is_a_match = false;
+                        break;
+                    }
+                }
+
+                if (is_a_match) {
                     this._onMatchSucceded();
                 }
                 else {
@@ -152,18 +204,46 @@ export class GameScene extends Phaser.Scene {
     }
 
     /**
-     * On a succeful match remove both matched cards from the cards in play
+     * Queues some card indexes to later on do something with them.
+     * E.g.: queue some card indexes to later on (aflter flip completes) animate.
+     */
+    private _queueCardIndexes(cards: Card[]) {
+        // Queue the cards to animate.
+        for (let i = 0; i < cards.length; i++) {
+            this._queuedCardIndexes.push(cards[i].gridIx);
+        }
+    }
+
+    /**
+     * On a succesfull match remove both matched cards from the cards in play
      * and disable the input on them.
      * Checks for game won condistions.
      */
     private _onMatchSucceded() {
+        this._queueCardIndexes(this._cardsInPlay);
+        
+        // Animate a successfull match on both cards once the last card flips.
+        let card: Card = this._cardsInPlay[this._cardsInPlay.length - 1];
+        card.once(CARD_EVENTS.FLIP_COMPLETE, () => {
+            // This could go into another method but then more arrays are required as params.
+            for (let i = 0; i < GG.SETTINGS.MAX_NUM_CARDS_IN_PLAY; i++) {
+                let ix = this._queuedCardIndexes.shift();
+                this.cards[ix].startSuccessAnimation();
+            }
+        }, this);
+
         while (this._cardsInPlay.length > 0) {
-            let card: Card = this._cardsInPlay.pop();
+            card = this._cardsInPlay.pop();
             card.setAsMatched();
-            card.startSuccessAnimation();
         }
 
+        // Increase the match counter and available game time.
         this.numMatches += 2;
+        this._gameTimeLeft += this._gameTimeAddMatch;
+        if (this._gameTimeLeft > this._gameTimeMax) {
+            this._gameTimeLeft = this._gameTimeMax;
+        }
+
         // Game won condition: all cards are matched.
         if (this.numMatches == this.cards.length) {
             this._doGameWon();
@@ -177,6 +257,18 @@ export class GameScene extends Phaser.Scene {
     private _onMatchFailed() {
         this._cardsInPlay[0].startFailedAnimation();
         TweenMax.delayedCall(1, this._rejectCardsInPlay, null, this);
+
+        this._queueCardIndexes(this._cardsInPlay);
+
+        // Animate a successfull match on both cards once the last card flips.
+        let card: Card = this._cardsInPlay[this._cardsInPlay.length - 1];
+        card.once(CARD_EVENTS.FLIP_COMPLETE, () => {
+            // This could go into another method but then more arrays are required as params.
+            for (let i = 0; i < GG.SETTINGS.MAX_NUM_CARDS_IN_PLAY; i++) {
+                let ix = this._queuedCardIndexes.shift();
+                this.cards[ix].startFailedAnimation();
+            }
+        }, this);
     }
 
     /**
@@ -189,7 +281,13 @@ export class GameScene extends Phaser.Scene {
         }
     }
 
+    /**
+     * Creates a particle based animation of cards falling on the screen like snowflakes.
+     */
     private _doGameWon() {
+        // Pause the lifebar updates.
+        this._isGameOver = true;
+
         let screen_w: number = this.game.renderer.width;
         let screen_h: number = this.game.renderer.height;
 
@@ -249,7 +347,28 @@ export class GameScene extends Phaser.Scene {
     }
 
     private _doGameLost() {
+        // Pause the lifebar updates.
+        this._isGameOver = true;
 
+        // Disable input on all cards.
+        for (let i = 0; i < this.cards.length; i++) {
+            const card: Card = this.cards[i];
+            card.setInterractive(false);
+        }
+
+        // Freeze everything in place.
+        TweenMax.killAll();
+
+        TweenMax.delayedCall(1, this._goBackToTheLobbyScene, null, this);
+    }
+
+    /**
+     * 
+     */
+    private _goBackToTheLobbyScene() {
+        TweenMax.killAll();
+        this.reset();
+        this.scene.start(GG.KEYS.SCENE.LOBBY);
     }
 
     /**
@@ -291,13 +410,13 @@ export class GameScene extends Phaser.Scene {
         let grid_cont_w: number = this.gridPadding.x + this.gridSize.x * (card.spr.width + this.gridPadding.x);
         let grid_cont_h: number = this.gridPadding.y + this.gridSize.y * (card.spr.height + this.gridPadding.y);
 
-        this._lifeBar.angle = 90;
+        this._lifeBar.angle = -90;
 
         // displayWidth and displayHeight are switched in landscape mode, because 
         // the original image orientation is horizontal and a verticall lifebar layout is used.
         this._lifeBar.setXY(
-            grid_cont_w + this._lifeBar.displayHeight,
-            (grid_cont_h - this._lifeBar.displayWidth) / 2);
+            grid_cont_w,
+            (grid_cont_h - this._lifeBar.displayWidth) / 2 + this._lifeBar.displayWidth);
 
         grid_cont_w += this._lifeBar.displayHeight + this.gridPadding.x;
 
@@ -332,7 +451,7 @@ export class GameScene extends Phaser.Scene {
     reset() {
         while (this.cards.length > 0) {
             const card: Card = this.cards.pop();
-            card.off("pointerdown", this._onCardPointerDown, this);
+            card.off(CARD_EVENTS.POINTER_DOWN, this._onCardPointerDown, this);
             this.actorsMng.poolCard(card);
         }
 
@@ -340,6 +459,7 @@ export class GameScene extends Phaser.Scene {
         TweenMax.killAll();
 
         this.numMatches = 0;
+        this._queuedCardIndexes = [];
     }
 
 
@@ -359,10 +479,6 @@ export class GameScene extends Phaser.Scene {
     disableResizeListener() {
         GG.setCurrentScene(null);
         this.scale.off('resize', this.fit, this);
-    }
-
-    _onBackBtnPointerDown() {
-        console.log('back btn down ...');
     }
 
     ////

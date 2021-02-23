@@ -37,9 +37,9 @@ export class GameScene extends Phaser.Scene {
 
     private _backBtn: ScaledButton;
 
-    private _gameTimeMax: number = 15 * 1000;
+    private _gameTimeMax: number = 25 * 1000;
     private _gameTimeLeft: number = 0;
-    private _gameTimeAddMatch: number = 3 * 1000;
+    private _gameTimeAddMatch: number = 5 * 1000;
 
     private _isGameOver: boolean = false;
 
@@ -87,12 +87,22 @@ export class GameScene extends Phaser.Scene {
         this._backBtn = new ScaledButton(this.add.image(0, 0, GG.KEYS.ATLAS_SS1, GG.KEYS.UI.BTN_BACK));
         // Not using CARD_EVENTS.POINTER_DOWN because that's a phaser game object specific.
         // Unlikely they change it to 'pointerdown_somemore' but at least we can easilly update later on.
-        this._backBtn.go.on("pointerdown", this._goBackToTheLobbyScene, this);
+        this._backBtn.go.on("pointerdown", ()=> {
+            this._goBackToTheLobbyScene();
+            GG.soundManager.playSound(GG.KEYS.SFX.BTN);
+        }, this);
 
         this.fit();
         this.enableResizeListener();
 
         this.startGame();
+
+        // Play the game instructions.
+        if (!GG.SHARED.gameInstrPlayed) {
+            GG.soundManager.playSound(GG.KEYS.SFX.GAME_INSTR);
+            GG.SHARED.gameInstrPlayed = true
+        }
+
         // DEV.
         // this.testCardCreation(); // OK.
         // this.testCardPooling(); // OK.
@@ -100,7 +110,6 @@ export class GameScene extends Phaser.Scene {
     }
 
     startGame() {
-        console.log("start game ...");
         this._queuedCardIndexes = [];
         this._isGameOver = false;
         this.numMatches = 0;
@@ -134,11 +143,8 @@ export class GameScene extends Phaser.Scene {
             card_types.push(i);
         }
 
-        // DEV: used in production.
-        // Phaser.Utils.Array.Shuffle(card_types);
-
-        // console.log("card_types: ", card_types);
-        // console.log("this.gridSize: ", this.gridSize);
+        // Randomize the cards.
+        Phaser.Utils.Array.Shuffle(card_types);
 
         for (let row = 0; row < this.gridSize.y; row++) {
             for (let col = 0; col < this.gridSize.x; col++) {
@@ -221,7 +227,7 @@ export class GameScene extends Phaser.Scene {
      */
     private _onMatchSucceded() {
         this._queueCardIndexes(this._cardsInPlay);
-        
+
         // Animate a successfull match on both cards once the last card flips.
         let card: Card = this._cardsInPlay[this._cardsInPlay.length - 1];
         card.once(CARD_EVENTS.FLIP_COMPLETE, () => {
@@ -344,6 +350,8 @@ export class GameScene extends Phaser.Scene {
             },
             emitCallbackScope: this
         });
+
+        GG.soundManager.playSound(GG.KEYS.SFX.GAME_WON);
     }
 
     private _doGameLost() {
@@ -358,8 +366,9 @@ export class GameScene extends Phaser.Scene {
 
         // Freeze everything in place.
         TweenMax.killAll();
+        TweenMax.delayedCall(5, this._goBackToTheLobbyScene, null, this);
 
-        TweenMax.delayedCall(1, this._goBackToTheLobbyScene, null, this);
+        GG.soundManager.playSound(GG.KEYS.SFX.GAME_LOST);
     }
 
     /**
@@ -368,7 +377,7 @@ export class GameScene extends Phaser.Scene {
     private _goBackToTheLobbyScene() {
         TweenMax.killAll();
         this.reset();
-        this.scene.start(GG.KEYS.SCENE.LOBBY);
+        this.scene.start(GG.KEYS.SCENE.LOBBY, { fromScene: GG.KEYS.SCENE.GAME });
     }
 
     /**

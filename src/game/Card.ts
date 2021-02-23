@@ -154,10 +154,12 @@ export class Card extends Phaser.Events.EventEmitter {
 
     startSuccessAnimation() {
         this._successTL.restart();
+        GG.soundManager.playRandomMatchSfx();
     }
 
     startFailedAnimation() {
         this._failTL.restart();
+        GG.soundManager.playSound(GG.KEYS.SFX.NO_MATCH);
     }
 
     /**
@@ -193,6 +195,7 @@ export class Card extends Phaser.Events.EventEmitter {
 
     private _onPointerDown(pointer, localX, localY, event) {
         this.emit(CARD_EVENTS.POINTER_DOWN, pointer, localX, localY, event, this);
+        GG.soundManager.playSound(GG.KEYS.SFX.CARD);
     }
 
     setAsMatched() {

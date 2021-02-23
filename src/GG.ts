@@ -1,5 +1,8 @@
+import SoundManager from './game/SoundManager';
+import MusicManager from './game/MusicManager';
+
 /**
- * A global game space for the game's settings and such.
+ * A global game space for the game's settings and easy shareables.
  */
 
 export const CARD_BACK_IX = 0;
@@ -72,6 +75,33 @@ export const KEYS = {
     FONTS: {
         CHANGA_ONE: 'ChangaOne'
     },
+
+    /**
+     * Keys for sound effects in the game.
+     */
+    SFX: {
+        /**
+         * Key for the sprite containing all the game sounds.
+         */
+        ALL_SFX_SPRITE: 'sfx_sprite',
+
+        CARD: 'card',
+        MATCH1: 'match1',
+        MATCH2: 'match2',
+        NO_MATCH: 'no_match',
+        BTN: 'btn',
+        GAME_LOST: 'game_lost',
+        GAME_WON: 'game_won',
+        GAME_INSTR: 'game_instr',
+        LOBBY_INSTR: 'lobby_instr'
+    },
+
+    MUSIC: {
+        /**
+         * One music for this project. Normally there are two or three tracks.
+         */
+        ALL: 'all'
+    },
     /**
      * Atlas / Sprite sheet. 
      * - card faces and back.
@@ -137,3 +167,21 @@ export function onWindowResize(new_width: number, new_height: number) {
         }
     }
 };
+
+/**
+ * Shared scene stuff
+ */
+export const SHARED = {
+    lobbyInstrPlayed: false,
+    gameInstrPlayed: false
+}
+
+/**
+ * Shared sound manager to easilly play sounds in any scene.
+ */
+export const soundManager: SoundManager = new SoundManager();
+
+/**
+ * Shared musicManager to easilly play music in any scene.
+ */
+export const musicManager: MusicManager = new MusicManager();

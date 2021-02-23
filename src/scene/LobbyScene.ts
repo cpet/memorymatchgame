@@ -1,7 +1,6 @@
 import Phaser from "phaser";
 import * as GG from "../GG";
 import { ScaledButton } from "../ui/ScaledButton";
-// import { ToggleButton } from 'src/ui/ToggleButton';
 
 export class LobbyScene extends Phaser.Scene {
     bg: Phaser.GameObjects.Image;
@@ -25,7 +24,7 @@ export class LobbyScene extends Phaser.Scene {
         });
     }
 
-    create() {
+    create(data) {
         this.bg = this.add.image(0, 0, GG.KEYS.BG.FAR_BG).setOrigin(0, 0);
 
         // Put all the grid select buttons in a container to easilly manage the fit screen requiremnt.
@@ -66,29 +65,17 @@ export class LobbyScene extends Phaser.Scene {
             }, this);
         }
 
-
-        // TODO: start title music.
-
-        // this._sfxToggleBtn = new ToggleButton(
-        //     this.add.sprite(-1000, -1000, GG.KEYS.TEX_MAIN_SS, GG.KEYS.UI.SFX_ON),
-        //     [GG.KEYS.UI.SFX_ON, GG.KEYS.UI.SFX_OFF]);
-        // this._sfxToggleBtn.setOrigin(1, 0);
-        // this._sfxToggleBtn.setState(GG.soundManager.soundOn);
-        // this._sfxToggleBtn.on('toggled', this.onSfxToggle, this);
-        // this._sfxToggleBtn.depth = 100;
-
-        // this._musicToggleBtn = new ToggleButton(
-        //     this.add.sprite(-1000, -1000, GG.KEYS.TEX_MAIN_SS, GG.KEYS.UI.MUSIC_ON),
-        //     [GG.KEYS.UI.MUSIC_ON, GG.KEYS.UI.MUSIC_OFF]);
-        // this._musicToggleBtn.setOrigin(1, 0);
-        // this._musicToggleBtn.setState(GG.musicManager.musicOn);
-        // this._musicToggleBtn.on('toggled', this.onMusicToggle, this);
-        // this._musicToggleBtn.depth = 101;
-
         this.fit();
         this.enableResizeListener();
 
-        // GG.musicManager.setMusic(GG.MUSIC_KEYS.MENU_MUSIC);
+        // Start the music.
+        GG.musicManager.setMusic(GG.KEYS.MUSIC.ALL);
+
+        // Play the lobby time instructions.
+        if (!GG.SHARED.lobbyInstrPlayed) {
+            GG.soundManager.playSound(GG.KEYS.SFX.LOBBY_INSTR);
+            GG.SHARED.lobbyInstrPlayed = true;
+        }
 
         // DEV.
         // Go quickly into the game scene with a predefined grid type.
@@ -107,6 +94,8 @@ export class LobbyScene extends Phaser.Scene {
             grid: this._gridDatas[grid_conf_ix]
         };
 
+        GG.soundManager.stopAllsounds();
+        GG.soundManager.playSound(GG.KEYS.SFX.BTN);
         this.scene.start(GG.KEYS.SCENE.GAME, data);
     }
 

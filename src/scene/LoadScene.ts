@@ -9,16 +9,16 @@ export class LoadScene extends Phaser.Scene {
 
     logoHere: Phaser.GameObjects.Image;
     preload() {
-        
+
         this.load.image(GG.KEYS.BG.FAR_BG, "./assets/img/bg.png");
         this.load.bitmapFont(GG.KEYS.FONTS.CHANGA_ONE, "./assets/fonts/ChangaOne_0.png", "./assets/fonts/ChangaOne.fnt");
         this.load.atlas(GG.KEYS.ATLAS_SS1, "./assets/img/sprite_sheet1.png", "./assets/img/sprite_sheet1.json");
 
         // Load the sfx sprite.
-        // this.load.audio(GG.SFX_SPRITES.ANSWER_FEEDBACK, ['assets/sfx/AnswerSfxSoundSprite.mp3', 'assets/sfx/AnswerSfxSoundSprite.ogg']);
+        this.load.audio(GG.KEYS.SFX.ALL_SFX_SPRITE, ['assets/sfx/SoundSpriteSheet1.mp3', 'assets/sfx/SoundSpriteSheet1.ogg']);
 
         // Load the music.
-        // this.load.audio(GG.MUSIC_KEYS.MENU_MUSIC, ['assets/music/MenuMusic.mp3', 'assets/music/MenuMusic.ogg']);
+        this.load.audio(GG.KEYS.MUSIC.ALL, ['assets/music/SunShineLoopable.mp3', 'assets/music/SunShineLoopable.ogg']);
     }
 
     constructor() {
@@ -75,9 +75,7 @@ export class LoadScene extends Phaser.Scene {
 
         this.enableResizeListener();
 
-        ////
-        // GG.soundManager.buildSounds(this);
-        // GG.musicManager.addMusicSound(this.sound.add(GG.MUSIC_KEYS.MENU_MUSIC, { loop: true, volume: GG.MUSIC_VOLUME }));
+        
 
         ////
         var data: Object = {
@@ -87,10 +85,14 @@ export class LoadScene extends Phaser.Scene {
 
         this.fit();
 
+        ////
+        GG.soundManager.buildSounds(this);
+        GG.musicManager.addMusicSound(this.sound.add(GG.KEYS.MUSIC.ALL, { loop: true, volume: GG.SETTINGS.MUSIC_VOLUME }));
+
         // Go to the title (without initial tap) as per client's request.
         this.disableResizeListener();
         this.scene.start(GG.KEYS.SCENE.LOBBY, data);
-        
+
         // Dev mode auto screne traversal.
         // this.scene.start(GG.KEYS.SCENE.LEVEL_MAP, data);
         // this.scene.start(GG.KEYS.SCENE.GAME, data);

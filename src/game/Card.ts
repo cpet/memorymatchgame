@@ -90,7 +90,7 @@ export class Card extends Phaser.Events.EventEmitter {
                 ease: Power2.easeOut
             })
             .to(this.spr, 0.1, {
-                angle: 15,
+                angle: 15,DS;RCXJKL.
                 ease: Power2.easeIn
             })
             .to(this.spr, 0.1, {

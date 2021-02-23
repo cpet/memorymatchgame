@@ -11,7 +11,7 @@ export class LoadScene extends Phaser.Scene {
     preload() {
         
         this.load.image(GG.KEYS.BG.FAR_BG, "./assets/img/bg.png");
-        this.load.bitmapFont(GG.KEYS.FONTS.CHANGA_ONE, "./assets/fonts/ChangaOne_0.png", "./assets/fonts/ChangaOne.xml");
+        this.load.bitmapFont(GG.KEYS.FONTS.CHANGA_ONE, "./assets/fonts/ChangaOne_0.png", "./assets/fonts/ChangaOne.fnt");
         this.load.atlas(GG.KEYS.ATLAS_SS1, "./assets/img/sprite_sheet1.png", "./assets/img/sprite_sheet1.json");
 
         // Load the sfx sprite.

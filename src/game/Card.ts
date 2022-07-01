@@ -12,7 +12,7 @@ export class Card extends Phaser.Events.EventEmitter {
 
     isFlipping: boolean = false;
     isShowingFace: boolean = false;
-    faceName: string;
+    // faceName: string;
 
     frames: Phaser.Animations.AnimationFrame[];
 
@@ -135,8 +135,8 @@ export class Card extends Phaser.Events.EventEmitter {
     set type(v: number) {
         if (v > 0 && v < this.frames.length) {
             this._type = v;
-            let stop_frame = this.frames[v];
-            this.faceName = stop_frame.frame.name;
+            // let stop_frame = this.frames[v];
+            // this.faceName = stop_frame.frame.name;
             // Freeze the animation at the stop frame.
             this.updateVisuals();
             // this.spr.setFrame(stop_frame.frame.name).stop();
